@@ -2,6 +2,9 @@ FROM --platform=linux/amd64 alpine:3.15.0 as download
 
 ARG TARGETPLATFORM
 
+ENV TINI_STATIC_VERSION=0.19.0
+ENV PIPING_SERVER_RUST_VERSION=0.10.2
+
 RUN apk add --no-cache curl
 
 RUN case $TARGETPLATFORM in\
@@ -15,9 +18,9 @@ RUN case $TARGETPLATFORM in\
                     tini_static_arch="armel";;\
       *)            exit 1;;\
     esac &&\
-    curl -L https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${tini_static_arch} > /tini-static &&\
+    curl -L https://github.com/krallin/tini/releases/download/v${TINI_STATIC_VERSION}/tini-static-${tini_static_arch} > /tini-static &&\
     chmod +x /tini-static &&\
-    curl -L https://github.com/nwtgck/piping-server-rust/releases/download/v0.10.2/piping-server-${rust_target}.tar.gz | tar xzf - &&\
+    curl -L https://github.com/nwtgck/piping-server-rust/releases/download/v${PIPING_SERVER_RUST_VERSION}/piping-server-${rust_target}.tar.gz | tar xzf - &&\
     cp ./piping-server-${rust_target}/piping-server /piping-server
 
 FROM scratch
