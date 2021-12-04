@@ -7,6 +7,24 @@ jobs:
   build_and_push:
     runs-on: ubuntu-18.04
     steps:
+    - run: echo ${{github.ref_name}}
+    - name: Create Docker image names
+      id: create-docker-image-names
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const dockerImageNames = [];
+          if (context.payload.ref === 'refs/heads/master') {
+            dockerImageNames.push('nwtgck/piping-server-rust-multi-platform:latest');
+          }
+          const matched = context.payload.ref.match(/^refs\/tags\/(.*)$/);
+          if (matched !== null) {
+            dockerImageNames.push(`nwtgck/piping-server-rust-multi-platform:${matched[1]}`);
+          }
+          console.log('dockerImageNames:', dockerImageNames);
+          const shouldPush = dockerImageNames.length !== 0;
+          core.setOutput('docker-push', shouldPush + "");
+          core.setOutput('docker-image-names', shouldPush ? dockerImageNames.join(",") : "dummy_image_name_not_to_push");
     - uses: actions/checkout@v2
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
@@ -22,6 +40,5 @@ jobs:
       with:
         context: .
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-        push: true
-        # TODO: support version tag
-        tags: nwtgck/piping-server-rust-multi-platform:latest
+        push: ${{ steps.create-docker-image-names.outputs.docker-push }}
+        tags: ${{ steps.create-docker-image-names.outputs.docker-image-names }}
