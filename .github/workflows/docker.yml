@@ -10,7 +10,7 @@ jobs:
     - run: echo ${{github.ref_name}}
     - name: Create Docker image names
       id: create-docker-image-names
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const dockerImageNames = [];
