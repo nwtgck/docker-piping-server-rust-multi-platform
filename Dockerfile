@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 alpine:3.19.1 as download
+FROM --platform=linux/amd64 alpine:3.20.0 as download
 
 ARG TARGETPLATFORM
 
